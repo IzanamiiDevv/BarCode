@@ -1,1 +1,2 @@
-gcc -o barcode main.c source/*.c
+mkdir build
+gcc -o build/barcode main.c source/*.c
