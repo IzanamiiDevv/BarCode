@@ -80,15 +80,22 @@ void array_flush(Array* arr) {
     } \
 }
 
-char* getSource(unsigned short count, char* cmd[]);
+
+/*======================================================*/
+char* getbuffer(unsigned short count, char* cmd[]);
+void cleanSourceBuffer(char* line);
 
 int main(unsigned short argc, char* argv[]) {
-    char* data = getSource(argc, argv);
+    char* data = getbuffer(argc, argv);
 
     return 0;
 }
 
-char* getSource(unsigned short count, char* cmd[]) {
+void cleanSourceBuffer(char* line) {
+    free(line);
+}
+
+char* getbuffer(unsigned short count, char* cmd[]) {
     char* src = NULL;
 
     for(unsigned short i = 0; i < count; i++) 
@@ -97,21 +104,35 @@ char* getSource(unsigned short count, char* cmd[]) {
     if(src == NULL) exit(1);
 
     FILE *fptr;
+    Array source = array_init();
+
     fptr = fopen(src, "r");
+
     if(fptr == NULL) {
         fclose(fptr);
         exit(1);
     };
 
-    char source[100];
+    char buffer[100];
+    while(fgets(buffer, 100, fptr)) {
 
-    while(fgets(source, 100, fptr)) {
-        printf("%s", source);
+        char* line = malloc(sizeof(char*) * strlen(buffer));
+        strcpy(line, buffer);
+
+        for(unsigned int i = 0; i < strlen(line); i++)
+            if(line[i] == '\n') line[i] = '\0';
+    
+        array_pushBack(char*, source, line);
     }
 
     fclose(fptr);
 
+    array_print("%s", char*, source);
+    
+    array_forEach(char*, source, cleanSourceBuffer);
+    array_flush(&source);
+
     
 
-    return source;
+    return " ";
 }
