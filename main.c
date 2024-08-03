@@ -82,12 +82,16 @@ void array_flush(Array* arr) {
 
 
 /*======================================================*/
-char* getbuffer(unsigned short count, char* cmd[]);
+Array getbuffer(unsigned short count, char* cmd[]);
 void cleanSourceBuffer(char* line);
 
 int main(unsigned short argc, char* argv[]) {
-    char* data = getbuffer(argc, argv);
+    Array data = getbuffer(argc, argv);
 
+    array_print("%s", char*, data);
+
+    array_forEach(char*, data, cleanSourceBuffer);
+    array_flush(&data);
     return 0;
 }
 
@@ -95,7 +99,7 @@ void cleanSourceBuffer(char* line) {
     free(line);
 }
 
-char* getbuffer(unsigned short count, char* cmd[]) {
+Array getbuffer(unsigned short count, char* cmd[]) {
     char* src = NULL;
 
     for(unsigned short i = 0; i < count; i++) 
@@ -126,13 +130,5 @@ char* getbuffer(unsigned short count, char* cmd[]) {
     }
 
     fclose(fptr);
-
-    array_print("%s", char*, source);
-    
-    array_forEach(char*, source, cleanSourceBuffer);
-    array_flush(&source);
-
-    
-
-    return " ";
+    return source;
 }
