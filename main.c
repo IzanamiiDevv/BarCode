@@ -82,13 +82,15 @@ void array_flush(Array* arr) {
 
 
 /*======================================================*/
+
 Array getbuffer(unsigned short count, char* cmd[]);
 void cleanSourceBuffer(char* line);
+void interpreter(Array source);
 
 int main(unsigned short argc, char* argv[]) {
     Array data = getbuffer(argc, argv);
-
-    array_print("%s", char*, data);
+    
+    interpreter(data);
 
     array_forEach(char*, data, cleanSourceBuffer);
     array_flush(&data);
@@ -113,14 +115,12 @@ Array getbuffer(unsigned short count, char* cmd[]) {
     fptr = fopen(src, "r");
 
     if(fptr == NULL) {
-        fclose(fptr);
         exit(1);
-    };
+    }
 
     char buffer[100];
     while(fgets(buffer, 100, fptr)) {
-
-        char* line = malloc(sizeof(char*) * strlen(buffer));
+        char* line = malloc(sizeof(char) * (strlen(buffer) + 1));
         strcpy(line, buffer);
 
         for(unsigned int i = 0; i < strlen(line); i++)
@@ -131,4 +131,23 @@ Array getbuffer(unsigned short count, char* cmd[]) {
 
     fclose(fptr);
     return source;
+}
+
+void interpreter(Array source) {
+    for(unsigned int i = 0; i < source.len; i++) {
+        unsigned short ascii = 0;
+        char *line = (char *)array_take(char*, source, i);
+        for(unsigned int j = 0; j < strlen(line); j++) {
+            if (line[j] == 'I') {
+                ascii += 10;
+                continue;
+            }
+            if (line[j] == 'l') {
+                ascii += 1;
+                continue;
+            }
+        }
+
+        printf("%c", (char)ascii);
+    }
 }
