@@ -85,12 +85,13 @@ void array_flush(Array* arr) {
 
 Array getbuffer(unsigned short count, char* cmd[]);
 void cleanSourceBuffer(char* line);
-void interpreter(Array source);
+void interpreter(Array source, unsigned short type);
 
 int main(unsigned short argc, char* argv[]) {
+    unsigned short doesReset = (short)scan_int("-r", argc, argv);
     Array data = getbuffer(argc, argv);
     
-    interpreter(data);
+    interpreter(data, doesReset);
 
     array_forEach(char*, data, cleanSourceBuffer);
     array_flush(&data);
@@ -133,21 +134,50 @@ Array getbuffer(unsigned short count, char* cmd[]) {
     return source;
 }
 
-void interpreter(Array source) {
-    for(unsigned int i = 0; i < source.len; i++) {
-        unsigned short ascii = 0;
-        char *line = (char *)array_take(char*, source, i);
-        for(unsigned int j = 0; j < strlen(line); j++) {
-            if (line[j] == 'I') {
-                ascii += 10;
-                continue;
+void interpreter(Array source, unsigned short type) {
+    if(type == 1) {
+        for(unsigned int i = 0; i < source.len; i++) {
+            unsigned short ascii = 0;
+            char *line = (char *)array_take(char*, source, i);
+            for(unsigned int j = 0; j < strlen(line); j++) {
+                switch (line[j]) {
+                case 'I':
+                    ascii += 10;
+                    break;
+                case 'l':
+                    ascii += 1;
+                    break;
+                case '|':
+                    ascii -= 1;
+                    break;
+                case ' ':
+                    ascii -= 10;
+                    break;
+                }
             }
-            if (line[j] == 'l') {
-                ascii += 1;
-                continue;
-            }
+            printf("%c", (char)ascii);
         }
-
-        printf("%c", (char)ascii);
+    }else {
+        unsigned short ascii = 0;
+        for(unsigned int i = 0; i < source.len; i++) {
+            char *line = (char *)array_take(char*, source, i);
+            for(unsigned int j = 0; j < strlen(line); j++) {
+                switch (line[j]) {
+                case 'I':
+                    ascii += 10;
+                    break;
+                case 'l':
+                    ascii += 1;
+                    break;
+                case '|':
+                    ascii -= 1;
+                    break;
+                case ' ':
+                    ascii -= 10;
+                    break;
+                }
+            }
+            printf("%c", (char)ascii);
+        }
     }
 }
